@@ -1,0 +1,12 @@
+POST http://localhost:8000/predict
+Content-Type: application/json
+
+{
+    "data": [{"label":"joint pain","value":"joint_pain"},{"label":"stomach pain","value":"stomach_pain"},{"label":"acidity","value":"acidity"}]
+
+}
+
+###
+GET  http://localhost:8000/
+
+###
