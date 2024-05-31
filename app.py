@@ -72,14 +72,14 @@ def get_data():
         # Query to find documents where the name field includes the provided disease name
         data = collection.find({"name": {"$regex": f".*{disease_name}.*", "$options": "i"}})
 
-        # Convert MongoDB cursor to list of dictionaries
-        data_list = list(data)
-
-        # Serialize the MongoDB documents to JSON
-        json_data = json_util.dumps(data_list)
-        print("Retrieved data:", json_data)
         
-        return json_data, 200, {'Content-Type': 'application/json'}
+        data_list = []
+        for document in data:
+            # Remove the _id field
+            del document["_id"]
+            data_list.append(document)
+
+        return jsonify(data_list)
     except Exception as e:
         return jsonify({"error": str(e)})
 
