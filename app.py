@@ -63,15 +63,25 @@ def predict():
 
     return jsonify({'prediction': predicted_disease})
     
-@app.route('/api/data', methods=['GET'])
+@app.route('/api/data', methods=['POST'])
 def get_data():
-    
-    data = collection.find({"name": {"$regex": ".*AIDS.*", "$options": "i"}})
+    try:
+        # Retrieve disease name from request data
+        disease_name = request.json.get('disease_name')
 
-    data_list = list(data)
-    json_data = json_util.dumps(data_list)
-    print("Retrieved data:", json_data)
-    return json_data
+        # Query to find documents where the name field includes the provided disease name
+        data = collection.find({"name": {"$regex": f".*{disease_name}.*", "$options": "i"}})
+
+        # Convert MongoDB cursor to list of dictionaries
+        data_list = list(data)
+
+        # Serialize the MongoDB documents to JSON
+        json_data = json_util.dumps(data_list)
+        print("Retrieved data:", json_data)
+        
+        return json_data, 200, {'Content-Type': 'application/json'}
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 if __name__ == '__main__':
