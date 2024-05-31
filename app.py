@@ -3,12 +3,28 @@ from flask_cors import CORS
 import pandas as pd
 import numpy as np
 from joblib import  load
+from pymongo import MongoClient
+from bson import json_util
 import json
-
 
 app = Flask(__name__)
 CORS(app) 
 model = load('gbmodel.pkl')
+
+uri = "mongodb+srv://aletidheerajkumarreddyimp:yoge111@cluster0.zdlglqh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+
+# Connect to MongoDB
+client = MongoClient(uri)
+
+# Select the database
+db = client["healthDB"]
+
+# Select the collection
+collection = db["diseasesInfo"]
+
+
+
 
 @app.route('/')
 def hello():
@@ -47,6 +63,15 @@ def predict():
 
     return jsonify({'prediction': predicted_disease})
     
+@app.route('/api/data', methods=['GET'])
+def get_data():
+    
+    data = collection.find({"name": {"$regex": ".*AIDS.*", "$options": "i"}})
+
+    data_list = list(data)
+    json_data = json_util.dumps(data_list)
+    print("Retrieved data:", json_data)
+    return json_data
 
 
 if __name__ == '__main__':
